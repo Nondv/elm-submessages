@@ -47,21 +47,21 @@ view : Model -> Html Msg
 view model =
     div []
         [ h3 [] [ text "Hooman" ]
-        , input [ placeholder "Name", value model.name, onInput ChangeName ] []
+        , input [ placeholder "Name", value model.name, onInput (HoomanEvent << ChangeHoomanName) ] []
         , br [] []
-        , input [ placeholder "Surname", value model.surname, onInput ChangeSurname ] []
+        , input [ placeholder "Surname", value model.surname, onInput (HoomanEvent << ChangeHoomanSurname) ] []
         , br [] []
-        , textarea [ placeholder "Bio", onInput ChangeBio, value model.bio ] []
+        , textarea [ placeholder "Bio", onInput (HoomanEvent << ChangeHoomanBio), value model.bio ] []
         , br [] []
-        , button [ onClick Save ] [ text "Save" ]
+        , button [ onClick (HoomanEvent SaveHooman) ] [ text "Save" ]
         , h3 [] [ text "Doggo" ]
-        , input [ placeholder "Name", value model.dogName, onInput ChangeDogName ] []
+        , input [ placeholder "Name", value model.dogName, onInput (DoggoEvent << ChangeDogName) ] []
         , br [] []
-        , input [ placeholder "Breed", value model.breed, onInput ChangeBreed ] []
+        , input [ placeholder "Breed", value model.breed, onInput (DoggoEvent << ChangeDogBreed) ] []
         , br [] []
-        , textarea [ placeholder "Bio", onInput ChangeDogBio, value model.dogBio ] []
+        , textarea [ placeholder "Bio", onInput (DoggoEvent << ChangeDogBio), value model.dogBio ] []
         , br [] []
-        , button [ onClick SaveDog ] [ text "Save" ]
+        , button [ onClick (DoggoEvent SaveDog) ] [ text "Save" ]
         ]
 
 
@@ -70,12 +70,20 @@ view model =
 
 
 type Msg
-    = ChangeName String
-    | ChangeSurname String
-    | ChangeBio String
-    | Save
-    | ChangeDogName String
-    | ChangeBreed String
+    = HoomanEvent HoomanMsg
+    | DoggoEvent DoggoMsg
+
+
+type HoomanMsg
+    = ChangeHoomanName String
+    | ChangeHoomanSurname String
+    | ChangeHoomanBio String
+    | SaveHooman
+
+
+type DoggoMsg
+    = ChangeDogName String
+    | ChangeDogBreed String
     | ChangeDogBio String
     | SaveDog
 
@@ -83,26 +91,40 @@ type Msg
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        ChangeName newName ->
+        HoomanEvent hoomanMsg ->
+            updateHooman hoomanMsg model
+
+        DoggoEvent doggoMsg ->
+            updateDoggo doggoMsg model
+
+
+updateHooman : HoomanMsg -> Model -> Model
+updateHooman msg model =
+    case msg of
+        ChangeHoomanName newName ->
             { model | name = newName }
 
-        ChangeSurname newSurname ->
+        ChangeHoomanSurname newSurname ->
             { model | surname = newSurname }
 
-        ChangeBio newBio ->
+        ChangeHoomanBio newBio ->
             { model | bio = newBio }
 
-        Save ->
+        SaveHooman ->
             { model
                 | name = model.name ++ "!"
                 , surname = model.surname ++ "!"
                 , bio = model.bio ++ "!"
             }
 
+
+updateDoggo : DoggoMsg -> Model -> Model
+updateDoggo msg model =
+    case msg of
         ChangeDogName newName ->
             { model | dogName = newName }
 
-        ChangeBreed newBreed ->
+        ChangeDogBreed newBreed ->
             { model | breed = newBreed }
 
         ChangeDogBio newBio ->
